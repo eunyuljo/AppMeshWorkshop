@@ -22,7 +22,10 @@ resource "aws_subnet" "public_subnet_one" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "PublicOne-${var.stack_name}"
+    Name                        = "PublicOne-${var.stack_name}"
+    "kubernetes.io/role/elb"    = "1"
+    "kubernetes.io/cluster/appmesh-workshop" = "shared"
+    "kubernetes.io/role/alb-ingress" = "1"
   }
 }
 
@@ -34,7 +37,10 @@ resource "aws_subnet" "public_subnet_two" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "PublicTwo-${var.stack_name}"
+    Name                        = "PublicTwo-${var.stack_name}"
+    "kubernetes.io/role/elb"    = "1"
+    "kubernetes.io/cluster/appmesh-workshop" = "shared"
+    "kubernetes.io/role/alb-ingress" = "1"
   }
 }
 
@@ -46,7 +52,10 @@ resource "aws_subnet" "public_subnet_three" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "PublicThree-${var.stack_name}"
+    Name                        = "PublicThree-${var.stack_name}"
+    "kubernetes.io/role/elb"    = "1"
+    "kubernetes.io/cluster/appmesh-workshop" = "shared"
+    "kubernetes.io/role/alb-ingress" = "1"
   }
 }
 
@@ -57,7 +66,10 @@ resource "aws_subnet" "private_subnet_one" {
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
-    Name = "PrivateOne-${var.stack_name}"
+    Name                        = "PrivateOne-${var.stack_name}"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/appmesh-workshop" = "shared"
+    "kubernetes.io/role/alb-ingress" = "1"
   }
 }
 
@@ -68,7 +80,10 @@ resource "aws_subnet" "private_subnet_two" {
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    Name = "PrivateTwo-${var.stack_name}"
+    Name                        = "PrivateTwo-${var.stack_name}"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/appmesh-workshop" = "shared"
+    "kubernetes.io/role/alb-ingress" = "1"
   }
 }
 
@@ -78,8 +93,12 @@ resource "aws_subnet" "private_subnet_three" {
   cidr_block        = "10.0.102.0/24"
   availability_zone = data.aws_availability_zones.available.names[2]
 
+
   tags = {
-    Name = "PrivateThree-${var.stack_name}"
+    Name                        = "PrivateThree-${var.stack_name}"
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/appmesh-workshop" = "shared"
+    "kubernetes.io/role/alb-ingress" = "1"
   }
 }
 

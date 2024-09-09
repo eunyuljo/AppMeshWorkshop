@@ -1,0 +1,18 @@
+#!/bin/bash -ex
+
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+REGION="ap-northeast-2"
+
+CRYSTAL_ECR_REPO="$ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/crystal-appmesh-workshop"
+NODEJS_ECR_REPO="$ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com/nodejs-appmesh-workshop"
+
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.ap-northeast-2.amazonaws.com
+
+docker build -t crystal-service ecsdemo-crystal
+docker tag crystal-service:latest $CRYSTAL_ECR_REPO:vanilla
+docker push $CRYSTAL_ECR_REPO:vanilla
+
+docker build -t nodejs-service ecsdemo-nodejs
+docker tag nodejs-service:latest $NODEJS_ECR_REPO:latest
+docker push $NODEJS_ECR_REPO:latest
+

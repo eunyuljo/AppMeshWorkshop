@@ -97,6 +97,12 @@ resource "aws_iam_role_policy" "ecs_task_role_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+
 # EC2 인스턴스 역할
 resource "aws_iam_role" "ec2_instance_role" {
   name = "EC2InstanceRole-${var.stack_name}"
@@ -145,47 +151,8 @@ resource "aws_iam_role_policy" "ec2_instance_role_policy" {
   })
 }
 
-# Lambda 실행 역할
-resource "aws_iam_role" "lambda_execution_role" {
-  name = "LambdaExecutionRole-${var.stack_name}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "lambda.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
-
-  tags = {
-    Name = "LambdaExecutionRole-${var.stack_name}"
-  }
-}
-
-# Lambda 역할 정책
-resource "aws_iam_role_policy" "lambda_execution_policy" {
-  name   = "LambdaExecutionPolicy-${var.stack_name}"
-  role   = aws_iam_role.lambda_execution_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "ec2:CreateKeyPair",
-        "ec2:DeleteKeyPair",
-        "ssm:PutParameter",
-        "ssm:DeleteParameter",
-        "kms:Encrypt",
-        "kms:Decrypt"
-      ]
-      Resource = "*"
-    }]
-  })
+# EC2 인스턴스에 대한 SSM 관리형 정책 추가
+resource "aws_iam_role_policy_attachment" "ec2_ssm_managed_instance_policy" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }

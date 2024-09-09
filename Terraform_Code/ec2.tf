@@ -95,4 +95,3 @@ resource "aws_instance" "ec2_external_instance" {
   EOF1
   )
 }
-

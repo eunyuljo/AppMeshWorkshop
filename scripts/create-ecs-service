@@ -1,0 +1,41 @@
+#!/bin/bash -ex
+
+# Set your VPC ID
+VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=VPC-appmesh-workshop" --query 'Vpcs[0].VpcId' --output text)
+
+# Get ECS Cluster Name
+CLUSTER=$(aws ecs list-clusters --query 'clusterArns[0]' --output text)
+echo "ECS Cluster: $CLUSTER"
+
+# Get ECS Task Definition ARN
+TASK_DEF=$(aws ecs describe-task-definition --task-definition crystal-task-appmesh-workshop --query 'taskDefinition.taskDefinitionArn' --output text)
+echo "ECS Task Definition: $TASK_DEF"
+
+# Get Target Group ARN
+TARGET_GROUP=$(aws elbv2 describe-target-groups --query 'TargetGroups[?TargetGroupName==`CrystalTargetGroup`].TargetGroupArn' --output text)
+echo "Target Group ARN: $TARGET_GROUP"
+
+# Get Subnet IDs
+SUBNET_ONE=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[0].SubnetId' --output text)
+SUBNET_TWO=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[1].SubnetId' --output text)
+SUBNET_THREE=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" --query 'Subnets[2].SubnetId' --output text)
+echo "Subnets: $SUBNET_ONE, $SUBNET_TWO, $SUBNET_THREE"
+
+# Get Security Group ID
+SECURITY_GROUP=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=SecurityGroup-ExternalLoadBalancer-appmesh-workshop" --query 'SecurityGroups[0].GroupId' --output text)
+echo "Security Group: $SECURITY_GROUP"
+
+
+aws ecs create-service \
+  --cluster $CLUSTER \
+  --service-name crystal-service-lb \
+  --task-definition $TASK_DEF \
+  --load-balancer targetGroupArn=$TARGET_GROUP,containerName=crystal-service,containerPort=3000 \
+  --desired-count 3 \
+  --launch-type FARGATE \
+  --network-configuration \
+      "awsvpcConfiguration={
+        subnets=[$SUBNET_ONE,$SUBNET_TWO,$SUBNET_THREE],
+        securityGroups=[$SECURITY_GROUP],
+        assignPublicIp=DISABLED}"
+

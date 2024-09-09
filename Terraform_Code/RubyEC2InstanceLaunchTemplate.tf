@@ -54,9 +54,13 @@ resource "aws_launch_template" "ruby_ec2_instance_lt" {
   EOF
   )
 
+  tag_specifications {
+    resource_type = "instance"
+
   tags = {
     Name = "Ruby-EC2Instance-${var.stack_name}"
   }
+ }
 }
 
 
@@ -79,7 +83,7 @@ resource "aws_autoscaling_group" "ruby_asg" {
   ]
 
   target_group_arns = [
-    aws_lb_target_group.crystal_target_group.arn
+    aws_lb_target_group.ruby_target_group.arn
   ]
 }
 
@@ -131,13 +135,13 @@ resource "aws_lb_listener" "internal_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.crystal_target_group.arn
+    target_group_arn = aws_lb_target_group.ruby_target_group.arn
   }
 }
 
-# Target Group for Crystal Application
-resource "aws_lb_target_group" "crystal_target_group" {
-  name        = "CrystalTargetGroup"
+# Target Group for Ruby Application
+resource "aws_lb_target_group" "ruby_target_group" {
+  name        = "RubyTargetGroup"
   port        = 3000
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
@@ -153,6 +157,7 @@ resource "aws_lb_target_group" "crystal_target_group" {
   }
 
   tags = {
-    Name = "CrystalTargetGroup"
+    Name = "RubyTargetGroup-${var.stack_name}"
   }
 }
+
