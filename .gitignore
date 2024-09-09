@@ -1,0 +1,27 @@
+# Terraform 상태 파일들
+*.tfstate
+*.tfstate.*
+
+# Terraform 충돌 정보
+.crash.log
+
+# 개인 정보나 민감한 정보가 들어갈 수 있는 백업 파일들
+*.tfvars
+*.tfvars.json
+
+# 계획 파일
+*.tfplan
+
+# 로그 파일들
+*.log
+
+# 디렉토리 내에 숨겨진 terraform 파일
+.terraform/
+.terraform.lock.hcl
+
+# 변동성 있는 파일들을 무시합니다.
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
